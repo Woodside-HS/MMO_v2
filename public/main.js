@@ -24,10 +24,10 @@ function keyPressed() {
             client.x += 5;
             break;
         case UP_ARROW:
-            client.y += 5;
+            client.y -= 5;
             break;
         case DOWN_ARROW:
-            client.y -= 5;
+            client.y += 5;
             break;
     }
 }
