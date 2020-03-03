@@ -1,5 +1,6 @@
 class Client {
     constructor(url = "//" + document.domain + ":" + location.port + "/ws") {
+        // deals with compatibility between secured and unsecured websockets
         if (url[0] !== "w") {
             if (location.protocol === "https") url = "wss:" + url;
             else url = "ws:" + url;

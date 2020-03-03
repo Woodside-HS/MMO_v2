@@ -6,10 +6,13 @@ let app = wss.app;  // express app
 
 let DATA = {};  // all the players data, keyed by playerId
 
-// http serve all the static (client) files in the public folder
+// serve all the static (client) files in the public folder over http
 app.use(express.static("./public"));
 
+// handle new websocket connection initiations
 app.ws("/ws", function(ws, req) {
+    let ID;
+
     // a new client connection has been received on websocket ws
     ws.on("message", function(msg) {
         let decoded = JSON.parse(msg);
@@ -17,7 +20,7 @@ app.ws("/ws", function(ws, req) {
         switch (decoded.type) {
             case "playerData":
                 // stash the playerId in the websocket
-                this.playerId = decoded.id;
+                ID = decoded.id;
                 DATA[decoded.id] = {
                     location: decoded.location,
                     color: decoded.color
@@ -27,19 +30,19 @@ app.ws("/ws", function(ws, req) {
 
     // When the connection for a player closes, delete that player's data
     ws.on("close", function() {
-        delete DATA[this.playerId];
+        delete DATA[ID];
     });
 
     ws.on("error", function() {
         console.log("websocket error on ", this);
-        delete DATA[this.playerId];
+        delete DATA[ID];
     });
 });
 
 // Every 15ms push all the player data to each of the clients
 setInterval(function() {
     wss.getWss().clients.forEach(function(client) {
-        if(client.readyState == 1){
+        if (client.readyState === 1) {
             client.send(JSON.stringify({
                 type: "allPlayerData",
                 playerData:DATA
